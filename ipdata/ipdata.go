@@ -13,6 +13,7 @@ type Client struct {
 	baseUrl    *url.URL
 	httpClient *http.Client
 	UserAgent  string
+	ApiKey     string
 }
 
 type Data struct {
@@ -73,6 +74,7 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", c.UserAgent)
+	req.Header.Set("Api-Key", c.ApiKey)
 
 	return req, nil
 }
