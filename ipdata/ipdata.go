@@ -3,6 +3,7 @@ package ipdata
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -33,6 +34,7 @@ type Data struct {
 	CallingCode    string  `json:"calling_code"`
 	Flag           string  `json:"flag"`
 	TimeZone       string  `json:"time_zone"`
+	Json           *string
 }
 
 func NewClient(httpClient *http.Client) (*Client, error) {
@@ -78,14 +80,20 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 	return req, nil
 }
 
-func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) {
+func (c *Client) do(req *http.Request, v interface{}) (*http.Response, *string, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
-	err = json.NewDecoder(resp.Body).Decode(v)
-	return resp, err
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(resp.Body)
+	body := buf.String()
+
+	err = json.Unmarshal(buf.Bytes(), v)
+
+	return resp, &body, err
 }
 
 func (c *Client) GetIpData(ip string) (*Data, error) {
@@ -94,9 +102,21 @@ func (c *Client) GetIpData(ip string) (*Data, error) {
 		return nil, err
 	}
 
-	var ipData *Data = &Data{}
-	_, err = c.do(req, ipData)
-	return ipData, err
+	var data = &Data{}
+	resp, body, err := c.do(req, data)
+	if err != nil {
+		switch resp.StatusCode {
+		case 400: // Bad Request
+			return nil, errors.New(*body)
+		case 429: // Too Many Requests
+			return nil, errors.New("you have exceeded requests limit. See https://ipdata.co")
+		default:
+			return nil, err
+		}
+	}
+	data.Json = body
+
+	return data, err
 }
 
 func (c *Client) GetMyIpData() (*Data, error) {
