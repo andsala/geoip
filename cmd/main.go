@@ -22,7 +22,7 @@ func main() {
 	app := &cli.App{}
 
 	app.Name = "geoip"
-	app.Usage = "Get info about IP geolocation"
+	app.Usage = "Get info about IP geolocation from ipdata.co"
 	app.Version = "0.0.1"
 	app.Compiled = time.Now()
 	app.ArgsUsage = "[IP...]"
@@ -57,7 +57,7 @@ COPYRIGHT:
 		&cli.StringFlag{
 			Name:        "user-agent",
 			Aliases:     []string{"u"},
-			Value:       "",
+			Value:       "andsala_"+app.Name+"/"+app.Version,
 			Usage:       "HTTP user agent",
 			EnvVars:     []string{"GEOIP_USER_AGENT"},
 			Destination: &opt.UserAgent,
