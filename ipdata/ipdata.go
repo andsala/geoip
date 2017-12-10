@@ -26,7 +26,7 @@ type Data struct {
 	ContinentCode  string  `json:"continent_code"`
 	Latitude       float32 `json:"latitude"`
 	Longitude      float32 `json:"longitude"`
-	Asn            string  `json:"asn"`
+	ASN            string  `json:"asn"`
 	Organisation   string  `json:"organisation"`
 	Postal         string  `json:"postal"`
 	Currency       string  `json:"currency"`
