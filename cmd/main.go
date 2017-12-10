@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/andsala/geoip/ipdata"
 	"gopkg.in/urfave/cli.v2"
+	"sort"
 	"strings"
 	"time"
 )
@@ -14,6 +15,7 @@ type Options struct {
 	ApiKey    string
 	UserAgent string
 	IpOnly    bool
+	Json      bool
 }
 
 var opt = Options{}
@@ -57,7 +59,7 @@ COPYRIGHT:
 		&cli.StringFlag{
 			Name:        "user-agent",
 			Aliases:     []string{"u"},
-			Value:       "andsala_"+app.Name+"/"+app.Version,
+			Value:       "andsala_" + app.Name + "/" + app.Version,
 			Usage:       "HTTP user agent",
 			EnvVars:     []string{"GEOIP_USER_AGENT"},
 			Destination: &opt.UserAgent,
@@ -66,7 +68,15 @@ COPYRIGHT:
 			Name:        "ip-only",
 			Aliases:     []string{"ip"},
 			Usage:       "Print current public IP and exit",
+			Value:       false,
 			Destination: &opt.IpOnly,
+		},
+		&cli.BoolFlag{
+			Name:        "json",
+			Aliases:     []string{"j"},
+			Usage:       "Print pure json",
+			Value:       false,
+			Destination: &opt.Json,
 		},
 	}
 
@@ -109,80 +119,86 @@ COPYRIGHT:
 		return nil
 	}
 
+	sort.Sort(cli.FlagsByName(app.Flags))
+
 	app.Run(os.Args)
 }
 
 func printIPData(data ipdata.Data) {
-	var out string = ""
+	var out = ""
 
-	out += "IP: " + data.IP + "\n"
-
-	if len(data.Postal) > 0 {
-		if len(data.Region) > 0 {
-			out += fmt.Sprintf("   %v %v\n", data.Postal, data.City)
-		} else {
-			out += fmt.Sprintf("   %v\n", data.Postal)
-		}
+	if opt.Json {
+		out = *data.Json
 	} else {
+		out += "IP: " + data.IP + "\n"
+
+		if len(data.Postal) > 0 {
+			if len(data.Region) > 0 {
+				out += fmt.Sprintf("   %v %v\n", data.Postal, data.City)
+			} else {
+				out += fmt.Sprintf("   %v\n", data.Postal)
+			}
+		} else {
+			if len(data.Region) > 0 {
+				out += fmt.Sprintf("   %v\n", data.City)
+			}
+		}
+
 		if len(data.Region) > 0 {
-			out += fmt.Sprintf("   %v\n", data.City)
+			out += fmt.Sprintf("   %v\n", data.Region)
 		}
-	}
 
-	if len(data.Region) > 0 {
-		out += fmt.Sprintf("   %v\n", data.Region)
-	}
+		if len(data.CountryName) > 0 {
+			out += "   " + data.CountryName
+			if len(data.CountryCode) > 0 {
+				out += fmt.Sprintf(" (%v)", data.CountryCode)
+			}
+			out += "\n"
+		}
 
-	if len(data.CountryName) > 0 {
-		out += "   " + data.CountryName
-		if len(data.CountryCode) > 0 {
-			out += fmt.Sprintf(" (%v)", data.CountryCode)
+		if len(data.ContinentName) > 0 {
+			out += "   " + data.ContinentName
+			if len(data.ContinentCode) > 0 {
+				out += fmt.Sprintf(" (%v)", data.ContinentCode)
+			}
+			out += "\n"
+		}
+
+		out += fmt.Sprintf("   Coordinates:     %g, %g\n", data.Latitude, data.Longitude)
+		out += "\n"
+
+		if len(data.Flag) > 0 {
+			out += "   Flag:            " + data.Flag + "\n"
+		}
+
+		if len(data.TimeZone) > 0 {
+			out += "   Timezone:        " + data.TimeZone + "\n"
+		}
+
+		if len(data.Currency) > 0 {
+			out += "   Currency:        " + data.Currency
+			if len(data.CurrencySymbol) > 0 {
+				out += " (" + data.CurrencySymbol + ")"
+			}
+			out += "\n"
+		}
+
+		if len(data.CallingCode) > 0 {
+			out += "   Calling code:    +" + data.CallingCode + "\n"
 		}
 		out += "\n"
-	}
 
-	if len(data.ContinentName) > 0 {
-		out += "   " + data.ContinentName
-		if len(data.ContinentCode) > 0 {
-			out += fmt.Sprintf(" (%v)", data.ContinentCode)
+		if len(data.Organisation) > 0 {
+			out += "   Organization:    " + data.Organisation + "\n"
 		}
-		out += "\n"
-	}
 
-	out += fmt.Sprintf("   Coordinates:     %g, %g\n", data.Latitude, data.Longitude)
-	out += "\n"
-
-	if len(data.Flag) > 0 {
-		out += "   Flag:            " + data.Flag + "\n"
-	}
-
-	if len(data.TimeZone) > 0 {
-		out += "   Timezone:        " + data.TimeZone + "\n"
-	}
-
-	if len(data.Currency) > 0 {
-		out += "   Currency:        " + data.Currency
-		if len(data.CurrencySymbol) > 0 {
-			out += " (" + data.CurrencySymbol + ")"
+		if len(data.ASN) > 0 {
+			out += "   AS number:       " + data.ASN + "\n"
 		}
-		out += "\n"
-	}
 
-	if len(data.CallingCode) > 0 {
-		out += "   Calling code:    +" + data.CallingCode + "\n"
-	}
-	out += "\n"
-
-	if len(data.Organisation) > 0 {
-		out += "   Organization:    " + data.Organisation + "\n"
-	}
-
-	if len(data.ASN) > 0 {
-		out += "   AS number:       " + data.ASN + "\n"
-	}
-
-	if !strings.HasSuffix(out, "\n\n") {
-		out += "\n"
+		if !strings.HasSuffix(out, "\n\n") {
+			out += "\n"
+		}
 	}
 
 	fmt.Print(out)
