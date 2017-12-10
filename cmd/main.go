@@ -59,7 +59,13 @@ func main() {
 			}
 			printIPData(*data)
 		} else {
-			// Other IP data
+			for _, ip := range ctx.Args() {
+				data, err := client.GetIpData(ip)
+				if err != nil {
+					return cli.NewExitError(err, 2)
+				}
+				printIPData(*data)
+			}
 		}
 
 		return nil
