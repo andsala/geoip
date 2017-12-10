@@ -1,7 +1,6 @@
 package ipdata
 
 import (
-	"net"
 	"testing"
 )
 
@@ -25,11 +24,11 @@ func TestClient_GetMyIpData(t *testing.T) {
 }
 
 func TestClient_GetIpData(t *testing.T) {
-	var addrs = []net.IP{
-		net.IPv4(1, 1, 1, 1),
-		net.IPv4(2, 2, 2, 2),
-		net.IPv4(3, 3, 3, 3),
-		net.IPv4(8, 8, 8, 8),
+	var addrs = []string{
+		"1.1.1.1",
+		"2.2.2.2",
+		"3.3.3.3",
+		"8.8.8.8",
 	}
 
 	c, err := NewClient(nil)
@@ -37,15 +36,11 @@ func TestClient_GetIpData(t *testing.T) {
 		t.Error("Unexpected error happened: ", err)
 	}
 
-	data, errs := c.GetIpData(addrs...)
-	if len(errs) > 0 {
-		t.Error(errs)
+	for _, addr := range addrs {
+		_, err := c.GetIpData(addr)
+		if err != nil {
+			t.Error(err)
+		}
+		//println(d.IP, d.CountryName, d.ContinentName, d.Organisation)
 	}
-	if len(data) != len(addrs) {
-		t.Error("Expected", len(addrs), "results, got", len(data))
-	}
-
-	//for _, d := range data {
-	//	println(d.IP, d.CountryName, d.ContinentName, d.Organisation)
-	//}
 }
