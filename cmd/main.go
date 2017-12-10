@@ -12,6 +12,7 @@ import (
 type Options struct {
 	ApiKey    string
 	UserAgent string
+	IpOnly    bool
 }
 
 var opt = Options{}
@@ -39,6 +40,11 @@ func main() {
 			EnvVar:      "GEOIP_USER_AGENT",
 			Destination: &opt.UserAgent,
 		},
+		cli.BoolFlag{
+			Name:        "ip-only, ip",
+			Usage:       "Print current public IP and exit",
+			Destination: &opt.IpOnly,
+		},
 	}
 
 	app.Action = func(ctx *cli.Context) error {
@@ -50,6 +56,15 @@ func main() {
 		client.UserAgent = opt.UserAgent
 		if len(opt.ApiKey) > 0 {
 			client.ApiKey = opt.ApiKey
+		}
+
+		if opt.IpOnly {
+			data, err := client.GetMyIpData()
+			if err != nil {
+				return cli.NewExitError(err, 2)
+			}
+			fmt.Println(data.IP)
+			return nil
 		}
 
 		if ctx.NArg() == 0 {
