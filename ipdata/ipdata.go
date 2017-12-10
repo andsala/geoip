@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"net"
 	"net/http"
 	"net/url"
 )
@@ -89,7 +88,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) {
 	return resp, err
 }
 
-func (c *Client) getSingleIpData(ip string) (*Data, error) {
+func (c *Client) GetIpData(ip string) (*Data, error) {
 	req, err := c.newRequest("GET", "/"+ip, nil)
 	if err != nil {
 		return nil, err
@@ -101,20 +100,5 @@ func (c *Client) getSingleIpData(ip string) (*Data, error) {
 }
 
 func (c *Client) GetMyIpData() (*Data, error) {
-	return c.getSingleIpData("")
-}
-
-func (c *Client) GetIpData(addrs ...net.IP) ([]*Data, []error) {
-	var ipDataList = make([]*Data, len(addrs))
-	var errors []error
-
-	for i, addr := range addrs {
-		ipData, err := c.getSingleIpData(addr.String())
-		if err != nil {
-			errors = append(errors, err)
-		}
-		ipDataList[i] = ipData
-	}
-
-	return ipDataList, errors
+	return c.GetIpData("")
 }
