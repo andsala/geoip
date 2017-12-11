@@ -4,11 +4,12 @@ import (
 	"os"
 
 	"fmt"
-	"github.com/andsala/geoip/ipdata"
-	"gopkg.in/urfave/cli.v2"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/andsala/geoip/ipdata"
+	"gopkg.in/urfave/cli.v2"
 )
 
 type Options struct {
