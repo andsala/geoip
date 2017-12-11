@@ -1,4 +1,8 @@
-# geoip -- IP geolocation with ipdata.co
+# geoip - IP geolocation with ipdata.co
+
+[![Build Status](https://travis-ci.org/andsala/geoip.svg?branch=master)](https://travis-ci.org/andsala/geoip)
+[![Go Report Card](https://goreportcard.com/badge/github.com/andsala/geoip)](https://goreportcard.com/report/github.com/andsala/geoip)
+[![GoDoc](https://godoc.org/github.com/andsala/geoip/ipdata?status.svg)](https://godoc.org/github.com/andsala/geoip/ipdata)
 
 # Installation
 ```sh
