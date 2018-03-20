@@ -37,4 +37,4 @@ IP: 8.8.8.8
 ```
 
 # License
-This project is distributed under [MIT license](https://opensource.org/licenses/MIT).
+This project is distributed under the [MIT License](https://github.com/andsala/geoip/blob/master/LICENSE).
