@@ -28,7 +28,7 @@ func main() {
 
 	app.Name = "geoip"
 	app.Usage = "Get info about IP geolocation from ipdata.co"
-	app.Version = "0.0.1"
+	app.Version = "0.1.0"
 	app.Compiled = time.Now()
 	app.ArgsUsage = "[IP...]"
 	app.CustomAppHelpTemplate = `NAME:
