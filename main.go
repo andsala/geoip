@@ -9,19 +9,19 @@ import (
 	"time"
 
 	"github.com/andsala/geoip/ipdata"
-	"gopkg.in/urfave/cli.v2"
 	"github.com/kyokomi/emoji"
+	"gopkg.in/urfave/cli.v2"
 )
 
-type Options struct {
-	ApiKey    string
+type options struct {
+	APIKey    string
 	UserAgent string
-	IpOnly    bool
-	Json      bool
+	IPOnly    bool
+	JSON      bool
 	NoColor   bool
 }
 
-var opt = Options{}
+var opt = options{}
 
 func main() {
 	app := &cli.App{}
@@ -57,7 +57,7 @@ COPYRIGHT:
 			Value:       "",
 			Usage:       "ipdata.co api key",
 			EnvVars:     []string{"GEOIP_API_KEY"},
-			Destination: &opt.ApiKey,
+			Destination: &opt.APIKey,
 		},
 		&cli.StringFlag{
 			Name:        "user-agent",
@@ -72,14 +72,14 @@ COPYRIGHT:
 			Aliases:     []string{"ip"},
 			Usage:       "Print current public IP and exit",
 			Value:       false,
-			Destination: &opt.IpOnly,
+			Destination: &opt.IPOnly,
 		},
 		&cli.BoolFlag{
 			Name:        "json",
 			Aliases:     []string{"j"},
 			Usage:       "Print pure json",
 			Value:       false,
-			Destination: &opt.Json,
+			Destination: &opt.JSON,
 		},
 		&cli.BoolFlag{
 			Name:        "no-color",
@@ -97,12 +97,12 @@ COPYRIGHT:
 		}
 
 		client.UserAgent = opt.UserAgent
-		if len(opt.ApiKey) > 0 {
-			client.ApiKey = opt.ApiKey
+		if len(opt.APIKey) > 0 {
+			client.APIKey = opt.APIKey
 		}
 
-		if opt.IpOnly {
-			data, err := client.GetMyIpData()
+		if opt.IPOnly {
+			data, err := client.GetMyIPData()
 			if err != nil {
 				return cli.Exit(err, 2)
 			}
@@ -111,14 +111,14 @@ COPYRIGHT:
 		}
 
 		if ctx.NArg() == 0 {
-			data, err := client.GetMyIpData()
+			data, err := client.GetMyIPData()
 			if err != nil {
 				return cli.Exit(err, 2)
 			}
 			printIPData(*data)
 		} else {
 			for _, ip := range ctx.Args().Slice() {
-				data, err := client.GetIpData(ip)
+				data, err := client.GetIPData(ip)
 				if err != nil {
 					return cli.Exit(err, 2)
 				}
@@ -146,8 +146,8 @@ func getFlagRepr(data ipdata.Data) string {
 func printIPData(data ipdata.Data) {
 	var out = ""
 
-	if opt.Json {
-		out = *data.Json
+	if opt.JSON {
+		out = *data.JSON
 	} else {
 		out += "IP: " + data.IP + "\n"
 

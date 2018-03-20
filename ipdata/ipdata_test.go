@@ -17,7 +17,7 @@ func TestClient_GetMyIpData(t *testing.T) {
 		t.Error("Unexpected error happened: ", err)
 	}
 
-	_, err = c.GetMyIpData()
+	_, err = c.GetMyIPData()
 	if err != nil {
 		t.Error("Request error:", err)
 	}
@@ -37,11 +37,10 @@ func TestClient_GetIpData(t *testing.T) {
 	}
 
 	for _, addr := range addrs {
-		_, err := c.GetIpData(addr)
+		_, err := c.GetIPData(addr)
 		if err != nil {
 			t.Error(err)
 		}
-		//println(d.IP, d.CountryName, d.ContinentName, d.Organisation)
 	}
 }
 
@@ -58,7 +57,7 @@ func TestClient_GetIpData_Fail(t *testing.T) {
 	}
 
 	for _, addr := range addrs {
-		_, err := c.GetIpData(addr)
+		_, err := c.GetIPData(addr)
 		if err == nil {
 			t.Errorf("Request with ip '%v' should fail", addr)
 		}
