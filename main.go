@@ -10,6 +10,7 @@ import (
 
 	"github.com/andsala/geoip/ipdata"
 	"gopkg.in/urfave/cli.v2"
+	"github.com/kyokomi/emoji"
 )
 
 type Options struct {
@@ -17,6 +18,7 @@ type Options struct {
 	UserAgent string
 	IpOnly    bool
 	Json      bool
+	NoColor   bool
 }
 
 var opt = Options{}
@@ -79,6 +81,13 @@ COPYRIGHT:
 			Value:       false,
 			Destination: &opt.Json,
 		},
+		&cli.BoolFlag{
+			Name:        "no-color",
+			Usage:       "Disable color and emoji output",
+			Value:       false,
+			EnvVars:     []string{"NO_COLOR"},
+			Destination: &opt.NoColor,
+		},
 	}
 
 	app.Action = func(ctx *cli.Context) error {
@@ -125,6 +134,15 @@ COPYRIGHT:
 	app.Run(os.Args)
 }
 
+func getFlagRepr(data ipdata.Data) string {
+	var flagKey = fmt.Sprintf(":%v:", strings.ToLower(data.CountryCode))
+	var flag = emoji.Sprintf(flagKey)
+	if opt.NoColor || flag == flagKey {
+		flag = data.Flag
+	}
+	return flag
+}
+
 func printIPData(data ipdata.Data) {
 	var out = ""
 
@@ -169,7 +187,7 @@ func printIPData(data ipdata.Data) {
 		out += "\n"
 
 		if len(data.Flag) > 0 {
-			out += "   Flag:            " + data.Flag + "\n"
+			out += "   Flag:            " + getFlagRepr(data) + "\n"
 		}
 
 		if len(data.TimeZone) > 0 {

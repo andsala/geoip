@@ -1,3 +1,5 @@
 package: github.com/andsala/geoip
 import:
 - package: gopkg.in/urfave/cli.v2
+- package: github.com/kyokomi/emoji
+  version: ^1.5.0

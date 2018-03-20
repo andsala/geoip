@@ -18,7 +18,7 @@ IP: 8.8.8.8
    North America (NA)
    Coordinates:     37.751, -97.822
 
-   Flag:            https://ipdata.co/flags/us.png
+   Flag:            🇺🇸
    Currency:        USD ($)
    Calling code:    +1
 
@@ -32,6 +32,7 @@ IP: 8.8.8.8
 --api-key, -a value     ipdata.co api key [GEOIP_API_KEY]
 --ip-only, --ip         Print current public IP and exit
 --json, -j              Print pure json
+--no-color              Disable color and emoji output [NO_COLOR] (http://no-color.org)
 --user-agent, -u value  HTTP user agent [GEOIP_USER_AGENT]
 ```
 
