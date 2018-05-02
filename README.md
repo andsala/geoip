@@ -4,6 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/andsala/geoip)](https://goreportcard.com/report/github.com/andsala/geoip)
 [![codecov](https://codecov.io/gh/andsala/geoip/branch/master/graph/badge.svg)](https://codecov.io/gh/andsala/geoip)
 [![GoDoc](https://godoc.org/github.com/andsala/geoip/ipdata?status.svg)](https://godoc.org/github.com/andsala/geoip/ipdata)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fandsala%2Fgeoip.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fandsala%2Fgeoip?ref=badge_shield)
 
 # Installation
 ```sh
@@ -38,3 +39,6 @@ IP: 8.8.8.8
 
 # License
 This project is distributed under the [MIT License](https://github.com/andsala/geoip/blob/master/LICENSE).
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fandsala%2Fgeoip.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fandsala%2Fgeoip?ref=badge_large)
