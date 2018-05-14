@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/andsala/geoip/ipdata"
-	"github.com/kyokomi/emoji"
 	"gopkg.in/urfave/cli.v2"
 )
 
@@ -28,7 +27,7 @@ func main() {
 
 	app.Name = "geoip"
 	app.Usage = "Get info about IP geolocation from ipdata.co"
-	app.Version = "0.1.0"
+	app.Version = "0.2.0"
 	app.Compiled = time.Now()
 	app.ArgsUsage = "[IP...]"
 	app.CustomAppHelpTemplate = `NAME:
@@ -135,12 +134,120 @@ COPYRIGHT:
 }
 
 func getFlagRepr(data ipdata.Data) string {
-	var flagKey = fmt.Sprintf(":%v:", strings.ToLower(data.CountryCode))
-	var flag = emoji.Sprintf(flagKey)
-	if opt.NoColor || flag == flagKey {
+	var flag = data.EmojiFlag
+	if opt.NoColor || len(flag) < 1 {
 		flag = data.Flag
 	}
 	return flag
+}
+
+func timeZoneString(timeZone ipdata.TimeZone) string {
+	name := len(timeZone.Name) > 0
+	abbr := len(timeZone.Abbr) > 0
+	offset := len(timeZone.Offset) > 0
+	//current := len(timeZone.CurrentTime) > 0
+	out := ""
+
+	if name {
+		out += timeZone.Name
+		if timeZone.IsDST {
+			out += " DST"
+		}
+		if offset {
+			out += ","
+		}
+		out += " "
+	}
+	if offset {
+		out += "GMT" + timeZone.Offset
+		if !name && bool(timeZone.IsDST) {
+			out += " DST"
+		}
+	}
+	if abbr {
+		if len(out) > 0 {
+			out += fmt.Sprintf(" (%s)", timeZone.Abbr)
+		} else {
+			out += timeZone.Abbr
+		}
+	}
+	return out
+}
+
+func currencyString(currency ipdata.Currency) string {
+	name := len(currency.Name) > 0
+	code := len(currency.Code) > 0
+	symbol := len(currency.Symbol) > 0
+	out := ""
+
+	if name {
+		out += currency.Name
+		if code && symbol {
+			out += fmt.Sprintf(" (%s, %s)", currency.Code, currency.Symbol)
+		} else if code {
+			out += fmt.Sprintf(" (%s)", currency.Code)
+		} else if symbol {
+			out += fmt.Sprintf(" (%s)", currency.Symbol)
+		}
+	} else {
+		if code && symbol {
+			fmt.Sprintf("%s (%s)", currency.Code, currency.Symbol)
+		} else if code {
+			out += currency.Code
+		} else if symbol {
+			out += currency.Symbol
+		}
+	}
+	return out
+}
+
+func languagesString(languages []ipdata.Language) string {
+	out := ""
+
+	for _, language := range languages {
+		out += language.Name + ", "
+	}
+	out = strings.TrimSuffix(out, ", ")
+
+	return out
+}
+
+func threatString(threat ipdata.Threat) string {
+	out := ""
+	var threats []string
+
+	if threat.IsTor {
+		threats = append(threats, "Tor")
+	}
+	if threat.IsProxy {
+		threats = append(threats, "Proxy")
+	}
+	if threat.IsAnonymous {
+		threats = append(threats, "Anonymous")
+	}
+	if threat.IsKnownAttacker {
+		threats = append(threats, "Known attacker")
+	}
+	if threat.IsKnownAbuser {
+		threats = append(threats, "Known abuser")
+	}
+	if threat.IsThreat {
+		threats = append(threats, "Threat")
+	}
+	if threat.IsBogon {
+		threats = append(threats, "Bogon")
+	}
+
+	if len(threats) > 0 {
+		for _, threat := range threats {
+			out += threat + ", "
+		}
+		out = strings.TrimSuffix(out, ", ")
+	} else {
+		out = "None"
+	}
+
+	return out
 }
 
 func printIPData(data ipdata.Data) {
@@ -190,16 +297,19 @@ func printIPData(data ipdata.Data) {
 			out += "   Flag:            " + getFlagRepr(data) + "\n"
 		}
 
-		if len(data.TimeZone) > 0 {
-			out += "   Timezone:        " + data.TimeZone + "\n"
+		timezone := timeZoneString(data.TimeZone)
+		if len(timezone) > 0 {
+			out += "   Time zone:       " + timezone + "\n"
 		}
 
-		if len(data.Currency) > 0 {
-			out += "   Currency:        " + data.Currency
-			if len(data.CurrencySymbol) > 0 {
-				out += " (" + data.CurrencySymbol + ")"
-			}
-			out += "\n"
+		currency := currencyString(data.Currency)
+		if len(currency) > 0 {
+			out += "   Currency:        " + currency + "\n"
+		}
+
+		languages := languagesString(data.Languages)
+		if len(languages) > 0 {
+			out += "   Languages:       " + languages + "\n"
 		}
 
 		if len(data.CallingCode) > 0 {
@@ -214,6 +324,8 @@ func printIPData(data ipdata.Data) {
 		if len(data.ASN) > 0 {
 			out += "   AS number:       " + data.ASN + "\n"
 		}
+
+		out += "   Threat:          " + threatString(data.Threat) + "\n"
 
 		if !strings.HasSuffix(out, "\n\n") {
 			out += "\n"

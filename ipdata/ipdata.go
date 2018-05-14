@@ -6,7 +6,10 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"strings"
 )
+
+type boolean bool
 
 // Client represent the wrapper for ipdata.co
 type Client struct {
@@ -18,24 +21,64 @@ type Client struct {
 
 // Data represent the information retrieved from ipdata.com
 type Data struct {
-	IP             string  `json:"ip"`
-	City           string  `json:"city"`
-	Region         string  `json:"region"`
-	CountryName    string  `json:"country_name"`
-	CountryCode    string  `json:"country_code"`
-	ContinentName  string  `json:"continent_name"`
-	ContinentCode  string  `json:"continent_code"`
-	Latitude       float32 `json:"latitude"`
-	Longitude      float32 `json:"longitude"`
-	ASN            string  `json:"asn"`
-	Organisation   string  `json:"organisation"`
-	Postal         string  `json:"postal"`
-	Currency       string  `json:"currency"`
-	CurrencySymbol string  `json:"currency_symbol"`
-	CallingCode    string  `json:"calling_code"`
-	Flag           string  `json:"flag"`
-	TimeZone       string  `json:"time_zone"`
-	JSON           *string
+	IP            string     `json:"ip"`
+	City          string     `json:"city"`
+	Region        string     `json:"region"`
+	RegionCode    string     `json:"region_code"`
+	CountryName   string     `json:"country_name"`
+	CountryCode   string     `json:"country_code"`
+	ContinentName string     `json:"continent_name"`
+	ContinentCode string     `json:"continent_code"`
+	Latitude     float32    `json:"latitude"`
+	Longitude    float32    `json:"longitude"`
+	ASN          string     `json:"asn"`
+	Organisation string     `json:"organisation"`
+	Postal       string     `json:"postal"`
+	CallingCode  string     `json:"calling_code"`
+	Flag         string     `json:"flag"`
+	EmojiFlag    string     `json:"emoji_flag"`
+	EmojiUnicode string     `json:"emoji_unicode"`
+	IsEU         boolean    `json:"is_eu"`
+	Languages    []Language `json:"languages"`
+	Currency     Currency   `json:"currency"`
+	TimeZone     TimeZone   `json:"time_zone"`
+	Threat       Threat     `json:"threat"`
+	JSON         *string
+}
+
+// Language information retrieved from ipdata.co
+type Language struct {
+	Name   string `json:"name"`
+	Native string `json:"native"`
+}
+
+// Currency information retrieved from ipdata.co
+type Currency struct {
+	Name   string `json:"name"`
+	Code   string `json:"code"`
+	Symbol string `json:"symbol"`
+	Native string `json:"native"`
+	Plural string `json:"plural"`
+}
+
+// TimeZone information retrieved from ipdata.co
+type TimeZone struct {
+	Name        string  `json:"name"`
+	Abbr        string  `json:"abbr"`
+	Offset      string  `json:"offset"`
+	IsDST       boolean `json:"is_dst"`
+	CurrentTime string  `json:"current_time"`
+}
+
+// Threat information retrieved from ipdata.co
+type Threat struct {
+	IsTor           boolean `json:"is_tor"`
+	IsProxy         boolean `json:"is_proxy"`
+	IsAnonymous     boolean `json:"is_anonymous"`
+	IsKnownAttacker boolean `json:"is_known_attacker"`
+	IsKnownAbuser   boolean `json:"is_known_abuser"`
+	IsThreat        boolean `json:"is_threat"`
+	IsBogon         boolean `json:"is_bogon"`
 }
 
 // NewClient generates a new Client.
@@ -118,4 +161,14 @@ func (c *Client) GetIPData(ip string) (*Data, error) {
 // GetMyIPData retrieves information about your public IP address.
 func (c *Client) GetMyIPData() (*Data, error) {
 	return c.GetIPData("")
+}
+
+func (bit boolean) UnmarshalJSON(data []byte) error {
+	asString := strings.ToLower(string(data))
+	if asString == "true" {
+		bit = true
+	} else {
+		bit = false
+	}
+	return nil
 }

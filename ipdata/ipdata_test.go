@@ -39,7 +39,7 @@ func TestClient_GetIpData(t *testing.T) {
 	for _, addr := range addrs {
 		_, err := c.GetIPData(addr)
 		if err != nil {
-			t.Error(err)
+			t.Error(addr, err)
 		}
 	}
 }
