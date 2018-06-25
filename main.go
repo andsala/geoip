@@ -191,7 +191,7 @@ func currencyString(currency ipdata.Currency) string {
 		}
 	} else {
 		if code && symbol {
-			fmt.Sprintf("%s (%s)", currency.Code, currency.Symbol)
+			out += fmt.Sprintf("%s (%s)", currency.Code, currency.Symbol)
 		} else if code {
 			out += currency.Code
 		} else if symbol {
