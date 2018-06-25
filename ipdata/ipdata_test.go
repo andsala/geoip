@@ -1,6 +1,7 @@
 package ipdata
 
 import (
+	"os"
 	"testing"
 )
 
@@ -16,6 +17,7 @@ func TestClient_GetMyIpData(t *testing.T) {
 	if err != nil {
 		t.Error("Unexpected error happened: ", err)
 	}
+	c.APIKey = os.Getenv("GEOIP_API_KEY")
 
 	_, err = c.GetMyIPData()
 	if err != nil {
@@ -35,6 +37,7 @@ func TestClient_GetIpData(t *testing.T) {
 	if err != nil {
 		t.Error("Unexpected error happened: ", err)
 	}
+	c.APIKey = os.Getenv("GEOIP_API_KEY")
 
 	for _, addr := range addrs {
 		_, err := c.GetIPData(addr)
@@ -55,6 +58,7 @@ func TestClient_GetIpData_Fail(t *testing.T) {
 	if err != nil {
 		t.Error("Unexpected error happened: ", err)
 	}
+	c.APIKey = os.Getenv("GEOIP_API_KEY")
 
 	for _, addr := range addrs {
 		_, err := c.GetIPData(addr)
