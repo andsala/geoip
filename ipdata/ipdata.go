@@ -29,21 +29,21 @@ type Data struct {
 	CountryCode   string     `json:"country_code"`
 	ContinentName string     `json:"continent_name"`
 	ContinentCode string     `json:"continent_code"`
-	Latitude     float32    `json:"latitude"`
-	Longitude    float32    `json:"longitude"`
-	ASN          string     `json:"asn"`
-	Organisation string     `json:"organisation"`
-	Postal       string     `json:"postal"`
-	CallingCode  string     `json:"calling_code"`
-	Flag         string     `json:"flag"`
-	EmojiFlag    string     `json:"emoji_flag"`
-	EmojiUnicode string     `json:"emoji_unicode"`
-	IsEU         boolean    `json:"is_eu"`
-	Languages    []Language `json:"languages"`
-	Currency     Currency   `json:"currency"`
-	TimeZone     TimeZone   `json:"time_zone"`
-	Threat       Threat     `json:"threat"`
-	JSON         *string
+	Latitude      float32    `json:"latitude"`
+	Longitude     float32    `json:"longitude"`
+	ASN           string     `json:"asn"`
+	Organisation  string     `json:"organisation"`
+	Postal        string     `json:"postal"`
+	CallingCode   string     `json:"calling_code"`
+	Flag          string     `json:"flag"`
+	EmojiFlag     string     `json:"emoji_flag"`
+	EmojiUnicode  string     `json:"emoji_unicode"`
+	IsEU          boolean    `json:"is_eu"`
+	Languages     []Language `json:"languages"`
+	Currency      Currency   `json:"currency"`
+	TimeZone      TimeZone   `json:"time_zone"`
+	Threat        Threat     `json:"threat"`
+	JSON          *string
 }
 
 // Language information retrieved from ipdata.co
@@ -79,6 +79,11 @@ type Threat struct {
 	IsKnownAbuser   boolean `json:"is_known_abuser"`
 	IsThreat        boolean `json:"is_threat"`
 	IsBogon         boolean `json:"is_bogon"`
+}
+
+// Error message received form ipdata.co
+type Error struct {
+	Message string `json:"message"`
 }
 
 // NewClient generates a new Client.
@@ -143,10 +148,15 @@ func (c *Client) GetIPData(ip string) (*Data, error) {
 
 	var data = &Data{}
 	resp, body, err := c.do(req, data)
-	if err != nil {
+	if err != nil || resp.StatusCode != 200 {
+		var errorResponse = &Error{}
+		json.Unmarshal([]byte(*body), errorResponse)
+
 		switch resp.StatusCode {
 		case 400: // Bad Request
 			return nil, errors.New(*body)
+		case 403:
+			return nil, errors.New(errorResponse.Message)
 		case 429: // Too Many Requests
 			return nil, errors.New("you have exceeded requests limit. See https://ipdata.co")
 		default:
