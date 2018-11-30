@@ -130,7 +130,10 @@ COPYRIGHT:
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func getFlagRepr(data ipdata.Data) string {
