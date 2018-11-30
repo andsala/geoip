@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type boolean bool
@@ -167,7 +168,13 @@ func (c *Client) GetIPData(ip string) (*Data, error) {
 		case 429: // Too Many Requests
 			return nil, errors.New("you have exceeded requests limit. See https://ipdata.co")
 		default:
-			return nil, errors.New(fmt.Sprintf("Unknown Error: %v", errorResponse.Message))
+			errorString := "Unknown Error"
+			if err != nil {
+				errorString = fmt.Sprintf("%v: %v", errorString, err.Error())
+			} else if len(errorResponse.Message) > 0 {
+				errorString = fmt.Sprintf("%v: %v", errorString, errorResponse.Message)
+			}
+			return nil, errors.New(errorString)
 		}
 	}
 	data.JSON = body
@@ -178,4 +185,14 @@ func (c *Client) GetIPData(ip string) (*Data, error) {
 // GetMyIPData retrieves information about your public IP address.
 func (c *Client) GetMyIPData() (*Data, error) {
 	return c.GetIPData("")
+}
+
+func (bit boolean) UnmarshalJSON(data []byte) error {
+	asString := strings.ToLower(string(data))
+	if asString == "true" {
+		bit = true
+	} else {
+		bit = false
+	}
+	return nil
 }
