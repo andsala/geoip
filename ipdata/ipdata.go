@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 type boolean bool
@@ -126,10 +126,18 @@ func (c *Client) do(req *http.Request, v interface{}) (*http.Response, *string, 
 	if err != nil {
 		return nil, nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(resp.Body)
+	_, err = buf.ReadFrom(resp.Body)
+	if err != nil {
+		return nil, nil, err
+	}
 	body := buf.String()
 
 	err = json.Unmarshal(buf.Bytes(), v)
@@ -170,14 +178,4 @@ func (c *Client) GetIPData(ip string) (*Data, error) {
 // GetMyIPData retrieves information about your public IP address.
 func (c *Client) GetMyIPData() (*Data, error) {
 	return c.GetIPData("")
-}
-
-func (bit boolean) UnmarshalJSON(data []byte) error {
-	asString := strings.ToLower(string(data))
-	if asString == "true" {
-		bit = true
-	} else {
-		bit = false
-	}
-	return nil
 }
