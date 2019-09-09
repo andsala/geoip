@@ -67,3 +67,24 @@ func TestClient_GetIpData_Fail(t *testing.T) {
 		}
 	}
 }
+
+func TestClient_GetIpData_Fail_MissingApiKey(t *testing.T) {
+	var addrs = []string{
+		"256.1.1.1",
+		"10.2.2.2",
+		"192.168.2.3",
+	}
+
+	c, err := NewClient(nil)
+	if err != nil {
+		t.Error("Unexpected error happened: ", err)
+	}
+	c.APIKey = ""
+
+	for _, addr := range addrs {
+		_, err := c.GetIPData(addr)
+		if err == nil {
+			t.Errorf("Request with ip '%v' should fail", addr)
+		}
+	}
+}
