@@ -147,74 +147,75 @@ func timeZoneString(timeZone ipdata.TimeZone) string {
 	name := len(timeZone.Name) > 0
 	abbr := len(timeZone.Abbr) > 0
 	offset := len(timeZone.Offset) > 0
-	out := ""
+	var out strings.Builder
 
 	if name {
-		out += timeZone.Name
+		out.WriteString(timeZone.Name)
 		if timeZone.IsDST {
-			out += " DST"
+			out.WriteString(" DST")
 		}
 		if offset {
-			out += ","
+			out.WriteString(",")
 		}
-		out += " "
+		out.WriteString(" ")
 	}
 	if offset {
-		out += "GMT" + timeZone.Offset
+		out.WriteString("GMT")
+		out.WriteString(timeZone.Offset)
 		if !name && bool(timeZone.IsDST) {
-			out += " DST"
+			out.WriteString(" DST")
 		}
 	}
 	if abbr {
-		if len(out) > 0 {
-			out += fmt.Sprintf(" (%s)", timeZone.Abbr)
+		if out.Len() > 0 {
+			out.WriteString(fmt.Sprintf(" (%s)", timeZone.Abbr))
 		} else {
-			out += timeZone.Abbr
+			out.WriteString(timeZone.Abbr)
 		}
 	}
-	return out
+	return out.String()
 }
 
 func currencyString(currency ipdata.Currency) string {
 	name := len(currency.Name) > 0
 	code := len(currency.Code) > 0
 	symbol := len(currency.Symbol) > 0
-	out := ""
+	var out strings.Builder
 
 	if name {
-		out += currency.Name
+		out.WriteString(currency.Name)
 		if code && symbol {
-			out += fmt.Sprintf(" (%s, %s)", currency.Code, currency.Symbol)
+			out.WriteString(fmt.Sprintf(" (%s, %s)", currency.Code, currency.Symbol))
 		} else if code {
-			out += fmt.Sprintf(" (%s)", currency.Code)
+			out.WriteString(fmt.Sprintf(" (%s)", currency.Code))
 		} else if symbol {
-			out += fmt.Sprintf(" (%s)", currency.Symbol)
+			out.WriteString(fmt.Sprintf(" (%s)", currency.Symbol))
 		}
 	} else {
 		if code && symbol {
-			out += fmt.Sprintf("%s (%s)", currency.Code, currency.Symbol)
+			out.WriteString(fmt.Sprintf("%s (%s)", currency.Code, currency.Symbol))
 		} else if code {
-			out += currency.Code
+			out.WriteString(currency.Code)
 		} else if symbol {
-			out += currency.Symbol
+			out.WriteString(currency.Symbol)
 		}
 	}
-	return out
+	return out.String()
 }
 
 func languagesString(languages []ipdata.Language) string {
-	out := ""
+	var out strings.Builder
 
 	for _, language := range languages {
-		out += language.Name + ", "
+		out.WriteString(language.Name)
+		out.WriteString(", ")
 	}
-	out = strings.TrimSuffix(out, ", ")
 
-	return out
+	return strings.TrimSuffix(out.String(), ", ")
 }
 
 func threatString(threat ipdata.Threat) string {
-	out := ""
+	var out strings.Builder
 	var threats []string
 
 	if threat.IsTor {
@@ -241,101 +242,95 @@ func threatString(threat ipdata.Threat) string {
 
 	if len(threats) > 0 {
 		for _, threat := range threats {
-			out += threat + ", "
+			out.WriteString(threat)
+			out.WriteString(", ")
 		}
-		out = strings.TrimSuffix(out, ", ")
+		return strings.TrimSuffix(out.String(), ", ")
 	} else {
-		out = "None"
+		return "None"
 	}
-
-	return out
 }
 
 func printIPData(data ipdata.Data) {
-	var out = ""
+	var out strings.Builder
 
 	if opt.JSON {
-		out = *data.JSON
+		out.WriteString(*data.JSON)
 	} else {
-		out += "IP: " + data.IP + "\n"
+		out.WriteString(fmt.Sprintf("IP: %v\n", data.IP))
 
 		if len(data.Postal) > 0 {
 			if len(data.Region) > 0 {
-				out += fmt.Sprintf("   %v %v\n", data.Postal, data.City)
+				out.WriteString(fmt.Sprintf("   %v %v\n", data.Postal, data.City))
 			} else {
-				out += fmt.Sprintf("   %v\n", data.Postal)
+				out.WriteString(fmt.Sprintf("   %v\n", data.Postal))
 			}
 		} else {
 			if len(data.Region) > 0 {
-				out += fmt.Sprintf("   %v\n", data.City)
+				out.WriteString(fmt.Sprintf("   %v\n", data.City))
 			}
 		}
 
 		if len(data.Region) > 0 {
-			out += fmt.Sprintf("   %v\n", data.Region)
+			out.WriteString(fmt.Sprintf("   %v\n", data.Region))
 		}
 
 		if len(data.CountryName) > 0 {
-			out += "   " + data.CountryName
+			out.WriteString("   " + data.CountryName)
 			if len(data.CountryCode) > 0 {
-				out += fmt.Sprintf(" (%v)", data.CountryCode)
+				out.WriteString(fmt.Sprintf(" (%v)", data.CountryCode))
 			}
-			out += "\n"
+			out.WriteString("\n")
 		}
 
 		if len(data.ContinentName) > 0 {
-			out += "   " + data.ContinentName
+			out.WriteString("   " + data.ContinentName)
 			if len(data.ContinentCode) > 0 {
-				out += fmt.Sprintf(" (%v)", data.ContinentCode)
+				out.WriteString(fmt.Sprintf(" (%v)", data.ContinentCode))
 			}
-			out += "\n"
+			out.WriteString("\n")
 		}
 
-		out += fmt.Sprintf("   Coordinates:     %g, %g\n", data.Latitude, data.Longitude)
-		out += "\n"
+		out.WriteString(fmt.Sprintf("   Coordinates:     %g, %g\n\n", data.Latitude, data.Longitude))
 
 		if len(data.Flag) > 0 {
-			out += "   Flag:            " + getFlagRepr(data) + "\n"
+			out.WriteString(fmt.Sprintf("   Flag:            %v\n", getFlagRepr(data)))
 		}
 
 		timezone := timeZoneString(data.TimeZone)
 		if len(timezone) > 0 {
-			out += "   Time zone:       " + timezone + "\n"
+			out.WriteString(fmt.Sprintf("   Time zone:       %v\n", timezone))
 		}
 
 		currency := currencyString(data.Currency)
 		if len(currency) > 0 {
-			out += "   Currency:        " + currency + "\n"
+			out.WriteString(fmt.Sprintf("   Currency:        %v\n", currency))
 		}
 
 		languages := languagesString(data.Languages)
 		if len(languages) > 0 {
-			out += "   Languages:       " + languages + "\n"
+			out.WriteString(fmt.Sprintf("   Languages:       %v\n", languages))
 		}
 
 		if len(data.CallingCode) > 0 {
-			out += "   Calling code:    +" + data.CallingCode + "\n"
+			out.WriteString(fmt.Sprintf("   Calling code:    +%v\n", data.CallingCode))
 		}
-		out += "\n"
+		out.WriteString("\n")
 
 		if len(data.ASN.Name) > 0 {
-			out += "   Organization:    " + data.ASN.Name
+			out.WriteString("   Organization:    " + data.ASN.Name)
 			if len(data.ASN.Domain) > 0 {
-				out += " (" + data.ASN.Domain + ")"
+				out.WriteString(" (" + data.ASN.Domain + ")")
 			}
-			out += "\n"
+			out.WriteString("\n")
 		}
 
 		if len(data.ASN.ASN) > 0 {
-			out += "   AS number:       " + data.ASN.ASN + "\n"
+			out.WriteString("   AS number:       " + data.ASN.ASN + "\n")
 		}
 
-		out += "   Threat:          " + threatString(data.Threat) + "\n"
-
-		if !strings.HasSuffix(out, "\n\n") {
-			out += "\n"
-		}
+		out.WriteString("   Threat:          " + threatString(data.Threat) + "\n\n")
 	}
 
-	fmt.Print(out)
+	fmt.Print(out.String())
 }
