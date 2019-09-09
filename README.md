@@ -19,21 +19,26 @@ IP: 8.8.8.8
    Coordinates:     37.751, -97.822
 
    Flag:            🇺🇸
-   Currency:        USD ($)
+   Time zone:       America/Chicago, GMT-0500 (CDT)
+   Currency:        US Dollar (USD, $)
+   Languages:       English
    Calling code:    +1
 
-   Organization:    Google LLC
+   Organization:    Google LLC (google.com)
    AS number:       AS15169
+   Threat:          None
 
 ```
 
 ## Options
 ```
---api-key, -a value     ipdata.co api key [GEOIP_API_KEY]
---ip-only, --ip         Print current public IP and exit
---json, -j              Print pure json
---no-color              Disable color and emoji output [NO_COLOR] (http://no-color.org)
---user-agent, -u value  HTTP user agent [GEOIP_USER_AGENT]
+--api-key value, -a value     ipdata.co api key [$GEOIP_API_KEY]
+--ip-only, --ip               Print current public IP and exit
+--json, -j                    Print pure json
+--no-color                    Disable color and emoji output [$NO_COLOR] (http://no-color.org)
+--user-agent value, -u value  HTTP user agent [$GEOIP_USER_AGENT]
+--help, -h                    show help
+--version, -v                 print the version
 ```
 
 # License
