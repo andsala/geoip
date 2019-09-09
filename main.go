@@ -1,9 +1,8 @@
 package main
 
 import (
-	"os"
-
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"time"
@@ -148,7 +147,6 @@ func timeZoneString(timeZone ipdata.TimeZone) string {
 	name := len(timeZone.Name) > 0
 	abbr := len(timeZone.Abbr) > 0
 	offset := len(timeZone.Offset) > 0
-	//current := len(timeZone.CurrentTime) > 0
 	out := ""
 
 	if name {
@@ -320,12 +318,16 @@ func printIPData(data ipdata.Data) {
 		}
 		out += "\n"
 
-		if len(data.Organisation) > 0 {
-			out += "   Organization:    " + data.Organisation + "\n"
+		if len(data.ASN.Name) > 0 {
+			out += "   Organization:    " + data.ASN.Name
+			if len(data.ASN.Domain) > 0 {
+				out += " (" + data.ASN.Domain + ")"
+			}
+			out += "\n"
 		}
 
-		if len(data.ASN) > 0 {
-			out += "   AS number:       " + data.ASN + "\n"
+		if len(data.ASN.ASN) > 0 {
+			out += "   AS number:       " + data.ASN.ASN + "\n"
 		}
 
 		out += "   Threat:          " + threatString(data.Threat) + "\n"

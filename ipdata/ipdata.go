@@ -21,7 +21,8 @@ type Client struct {
 	APIKey     string
 }
 
-// Data represent the information retrieved from ipdata.com
+// Data represent the information retrieved from ipdata.co
+// See https://docs.ipdata.co/api-reference/response-fields
 type Data struct {
 	IP            string     `json:"ip"`
 	City          string     `json:"city"`
@@ -33,8 +34,7 @@ type Data struct {
 	ContinentCode string     `json:"continent_code"`
 	Latitude      float32    `json:"latitude"`
 	Longitude     float32    `json:"longitude"`
-	ASN           string     `json:"asn"`
-	Organisation  string     `json:"organisation"`
+	ASN           ASN        `json:"asn"`
 	Postal        string     `json:"postal"`
 	CallingCode   string     `json:"calling_code"`
 	Flag          string     `json:"flag"`
@@ -81,6 +81,15 @@ type Threat struct {
 	IsKnownAbuser   boolean `json:"is_known_abuser"`
 	IsThreat        boolean `json:"is_threat"`
 	IsBogon         boolean `json:"is_bogon"`
+}
+
+// ASN information retrieved from ipdata.co
+type ASN struct {
+	ASN    string `json:"asn"`
+	Name   string `json:"name"`
+	Domain string `json:"domain"`
+	Route  string `json:"route"`
+	Type   string `json:"type"`
 }
 
 // Error message received form ipdata.co
